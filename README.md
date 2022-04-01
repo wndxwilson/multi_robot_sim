@@ -1,6 +1,7 @@
 # multi_robot_sim
 
 This package provides a mutli robot simulator in an simulated real world outdoor path.
+[Docs](https://rawcdn.githack.com/wndxwilson/multi_robot_sim/e9aa495f432d58035a326a04864b7c2e786c6ea1/doc/html/index.html)
 
 #### Features
 - Generate gazebo world using geospatial data from OpenStreetMap [osm2gazebo](https://github.com/wndxwilson/osm2gazebo)
