@@ -14,7 +14,10 @@ from utils.osm_utils import OsmUtil
 
 class WaypointNavigation:
     def __init__(self,namespace):
-        
+        """WaypointNavigation
+        This module implements the robot way point navigation
+        It has 4 states idle, navigation, pause, and end state
+        """
         self.namespace = namespace
         self.waypoints = PoseArray()
 
@@ -45,18 +48,34 @@ class WaypointNavigation:
         self.transition = ""
 
     def handle_start_waypoint(self,req):
-        self.transition = "start"
+        """
+        This service set the transition to start
+        """
+        self.transition = "resume"
         return (True, "start waypoint navigation")
 
     def handle_stop_waypoint(self,req):
+        """
+        This service set the transition to cancel
+        """
         self.transition = "cancel"
         return (True, "cancel waypoint navigation")
 
     def handle_pause_waypoint(self,req):
+        """
+        This service set the transition to pause
+        """
         self.transition = "pause"
         return (True, "Pause waypoint navigation")
 
     def handle_send_waypoint(self,req):
+        """
+        This service handles the waypoint navigation
+        It formats the waypoints in to goals depending on the mode
+        mode0 : 1-way
+        mode1 : Disjointed loop
+        mode2 : Closed loop
+        """
         nodes = list(req.nodes)
         if req.mode == "mode0":
             self.waypoints = self.gg.getGoals(nodes)
@@ -82,28 +101,40 @@ class WaypointNavigation:
         return (True)
 
     def run(self):
+        """
+        Calls the state machine to run
+        """
         self.generateStateMahine().run()
     
     def generateStateMahine(self):
+        """
+        Initialise the state machine and add all the releveant states
+        """
         sm = StateMachine()
-        sm.add_state("waitingState",self.waitingState)
+        sm.add_state("idleState",self.idleState)
         sm.add_state("NavigationState",self.navigationState)
         sm.add_state("pauseState",self.pauseState)
         sm.add_state("endState",None,end_state=1)
-        sm.set_start("WaitingState")
+        sm.set_start("idleState")
 
         return sm
 
     # State machine states
-    def waitingState(self):
+    def idleState(self):
+        """
+        This is the idle sate, it waits for the transition "navigate" to go to the navigation state
+        """
         if self.transition == "navigate":
             self.transition = ""
             return ("NavigationState")
 
         else:
-            return ("waitingState")
+            return ("idleState")
     
     def navigationState(self):
+        """
+        This is the navigation sate, it sends the goals to the waypoint navigation
+        """
         if(self.waypoints.poses):
             pose = self.waypoints.poses.pop()
             if self.mode == "loop":
@@ -114,9 +145,17 @@ class WaypointNavigation:
             cancel_msg = GoalID()
             self.cancel_pub.publish(cancel_msg)
             self.transition = ""
-            return ("waitingState")
+            return ("idleState")
 
     def waypointNavigation(self,pose):
+        """
+        The waypoint navigation sends the goal to the move base
+        if success it will return to the navigations tate
+        if paused it will return to the pause state
+        if failed or cancel it will return to the idle state
+        @parm pose Pose
+        @return state
+        """
         goal = self.createGoalMsg(pose)
         rospy.logwarn("Going to goal...")
         self.move_base_client.send_goal(goal)
@@ -138,13 +177,18 @@ class WaypointNavigation:
                 cancel_msg = GoalID()
                 self.cancel_pub.publish(cancel_msg)
                 self.transition = ""
-                return("waitingState")
+                return("idleState")
         
 
         return ("navigationState")
 
         
     def createGoalMsg(self, pose):
+        """
+        The function converts the Pose msg to MoveBaseGoal msg
+        @param pose Pose
+        @return goal MoveBaseGoal
+        """
         goal = MoveBaseGoal()
         goal.target_pose.header.frame_id = self.namespace + "/odom"
         goal.target_pose.pose = pose
@@ -154,12 +198,18 @@ class WaypointNavigation:
 
     
     def pauseState(self):
-        if self.transition == "start":
+        """
+        This is the pause sate
+        If resume it reutrns to the navgation state
+        If cancel it retunrs to the idle state
+        @return state
+        """
+        if self.transition == "resume":
             self.transition = ""
             return("navigationState")
         elif self.transition == "cancel":
             self.transition = ""
-            return("waitingState")
+            return("idleState")
         return("pauseState")
         
 if __name__ == '__main__':

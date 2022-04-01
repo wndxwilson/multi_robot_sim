@@ -8,6 +8,10 @@ import sys
 
 class StatusRelay:
     def __init__(self,namespace):
+        """StatusRelay
+        This module subscribes to the robot's odometry and move_base status
+        It syncronise the data and published it to the status topic 
+        """
         self.namespace = namespace
 
         pose_sub = message_filters.Subscriber("odom",Odometry)
@@ -20,6 +24,10 @@ class StatusRelay:
         self.status_sender = rospy.Publisher('/status', MultiRobotSimStatus, queue_size = 20)
 
     def sync_callback(self,pose,status):
+        """
+        The callback function gets the robot position and status
+        It formats the data to MultiRobotSimStatus.msg and published it to the status topic
+        """
         status_msg = MultiRobotSimStatus()
         status_msg.robot_id = self.namespace
         status_msg.position = pose.pose.pose.position

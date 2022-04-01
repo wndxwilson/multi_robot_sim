@@ -31,6 +31,9 @@ class MovebaseStatus(Enum):
 
 class BackendService():
     def __init__(self):
+        """BackendService
+        This module implements a ROS service that intreacts with the simulator
+        """
 
         # Create Service
         spawn_service = rospy.Service('spawn_robot',MultiRobotSimSpawnRobot,self.handle_spawn_robot)
@@ -54,6 +57,10 @@ class BackendService():
         rospy.spin()
     
     def handle_shut_down(self):
+        """
+        This service save the logged data into a .csv file once the simulator ends
+        """
+
         if not self.log_data:
             rospy.loginfo("no data found")
             return
@@ -98,7 +105,10 @@ class BackendService():
                 rospy.logwarn("saving failed") 
 
     def handle_spawn_robot(self, req):
-
+        """
+        This service spawns a robot into the gazebo world and starts all the required nodes
+        Error checking is done to ensure no 2 robot with the same name exists
+        """
         try:
             # Check if robot exist
             rospy.wait_for_service('/gazebo/get_model_properties',5.0)
@@ -120,7 +130,10 @@ class BackendService():
             return MultiRobotSimSpawnRobotResponse("Failed")
 
     def handle_del_robot(self, req):
-
+        """
+        This service despawn a robot from the gazebo world and shutdown all the required nodes
+        Error checking is done to ensure no the robot exists before deleting
+        """
 
         try:
             # Check if robot exist
@@ -152,6 +165,10 @@ class BackendService():
 
     
     def handle_robot_status(self, req):
+        """
+        This service returns the robots status
+        Error checking is done to ensure that the specified robot exists 
+        """
 
         if(req.robot_name == ""):
             ret_json = json.dumps(self.history)
@@ -166,6 +183,10 @@ class BackendService():
 
 
     def handle_status(self, msg):
+        """
+        The callback functtion subscribes to the status topic 
+        Robot status is updates into a dictionary and logged into a list
+        """
         # Add robot data to history
         lnglat_pos = self.gg.convertToLngLat((msg.position.x,msg.position.y))
         self.history[msg.robot_id] = {  

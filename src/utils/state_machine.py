@@ -1,8 +1,11 @@
 # !/usr/local/bin/python
 import rospy
-from rospy.exceptions import ROSTimeMovedBackwardsException
 
 class StateMachine:
+    """StateMachine
+    This module is a template for state machine
+    It can add, states and handles the running
+    """
     
     def __init__(self):
         self.handlers = {}
@@ -10,15 +13,27 @@ class StateMachine:
         self.endStates = []
 
     def add_state(self, name, handler, end_state=0):
+        """
+        Add a state to the state machine
+        @param name string
+        @handler function
+        """
         name = name.upper()
         self.handlers[name] = handler
         if end_state:
             self.endStates.append(name)
 
     def set_start(self, name):
+        """
+        set the start state of the state machine
+        @param name string
+        """
         self.startState = name.upper()
 
     def run(self, ):
+        """
+        Run the state machine
+        """
         try:
             handler = self.handlers[self.startState]
         except:
