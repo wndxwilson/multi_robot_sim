@@ -1,0 +1,4 @@
+string robot_name
+geometry_msgs/PoseArray goals
+---
+bool result

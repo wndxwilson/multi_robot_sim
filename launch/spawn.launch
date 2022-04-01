@@ -1,0 +1,57 @@
+<launch>
+    <arg name="model" default="$(env TURTLEBOT3_MODEL)" doc="model type [burger, waffle, waffle_pi]"/>
+
+    <arg name="namespace"  default=""/>
+    <arg name="x_pos" default="0.0"/>
+    <arg name="y_pos" default="0.0"/>
+    <arg name="z_pos" default="0.0"/>
+    <arg name="yaw"   default="1.57"/>
+    <arg name="move_forward_only" default="false"/>
+
+    <group ns = "$(arg namespace)">
+        <param name="robot_description" command="$(find xacro)/xacro --inorder $(find ros_sim)/description/urdf/turtlebot3_$(arg model).urdf.xacro" />
+        <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-urdf -model $(arg namespace) -x $(arg x_pos) -y $(arg y_pos) -z $(arg z_pos) -Y $(arg yaw) -param robot_description" />
+
+        <!-- Namespace and tf_prefix are assumed to be the same -->
+        <!--robot_state_publisher, publishing state of robot to tf-->
+        <node pkg="robot_state_publisher" type="robot_state_publisher" name="robot_state_publisher" output="screen">
+        <param name="publish_frequency" type="double" value="50.0" />
+        <param name="tf_prefix" value="$(arg namespace)" />
+        </node>    
+        
+        <!-- Waypoint navigation -->
+        <node pkg="multi_robot_sim" type="waypoint_navigation.py" name="waypoint_nav" args="$(arg namespace)" output="screen"/>
+
+        <!-- status relay, publish robot status to a node -->
+        <node pkg="multi_robot_sim" type="status_relay.py" name="status_relay" args="$(arg namespace)" output="screen"/>
+        
+        <!-- Move base -->
+        <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
+            <!-- Default configs form the TB3 repos -->
+            <param name="base_local_planner" value="dwa_local_planner/DWAPlannerROS" />
+            <rosparam file="$(find multi_robot_sim)/param/costmap_common_params.yaml" command="load" ns="global_costmap" />
+            <rosparam file="$(find multi_robot_sim)/param/costmap_common_params.yaml" command="load" ns="local_costmap" />
+            <rosparam file="$(find multi_robot_sim)/param/local_costmap_params.yaml" command="load" />
+            <rosparam file="$(find multi_robot_sim)/param/global_costmap_params_no_map.yaml" command="load" />
+
+            <rosparam file="$(find multi_robot_sim)/param/move_base_params.yaml" command="load" />
+            <rosparam file="$(find multi_robot_sim)/param/dwa_local_planner_params.yaml" command="load" />
+
+            <!-- Set tf_prefix for frames explicity, overwriting defaults -->
+            <param name="global_costmap/scan/sensor_frame" value="$(arg namespace)/base_scan"/>
+            <param name="global_costmap/obstacle_layer/scan/sensor_frame"
+            value="$(arg namespace)/base_scan"/>
+            <param name="global_costmap/global_frame" value="$(arg namespace)/odom"/>  
+            <param name="global_costmap/robot_base_frame"
+            value="$(arg namespace)/base_footprint"/>
+            <param name="local_costmap/scan/sensor_frame" value="$(arg namespace)/base_scan"/>
+            <param name="local_costmap/obstacle_layer/scan/sensor_frame"
+            value="$(arg namespace)/base_scan"/>
+            <param name="local_costmap/global_frame" value="$(arg namespace)/odom"/>
+            <param name="local_costmap/robot_base_frame"
+            value="$(arg namespace)/base_footprint"/>
+
+            <param name="DWAPlannerROS/min_vel_x" value="0.0" if="$(arg move_forward_only)" />
+        </node>
+    </group>
+</launch>

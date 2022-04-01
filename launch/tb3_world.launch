@@ -1,0 +1,23 @@
+<launch>
+    <arg name="map_file" default="$(find multi_robot_sim)/maps/emptymap.yaml"/>
+    <arg name="world_name" default="$(find multi_robot_sim)/worlds/osm2gazebo.sdf"/>
+    <arg name="yaml_path" default="$(find multi_robot_sim)/maps/osm2gazebo.yaml"/>
+
+    <rosparam param="yaml_path" subst_value="True">$(arg yaml_path)</rosparam>
+    
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+        <arg name="world_name" value="$(arg world_name)"/>
+        <arg name="paused" value="false"/>
+        <arg name="use_sim_time" value="true"/>
+        <arg name="gui" value="true"/>
+        <arg name="headless" value="false"/>
+        <arg name="debug" value="false"/>
+    </include> 
+
+    <!-- Map server -->
+    <!-- <node pkg="map_server" name="map_server" type="map_server" args="$(arg map_file)"/> -->
+
+    <node pkg="rviz" type="rviz" name="rviz" required="true"
+          args="-d $(find ros_sim)/rviz/multi_turtlebot3_navigation.rviz"/>
+          
+</launch>

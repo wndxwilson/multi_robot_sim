@@ -1,0 +1,5 @@
+uint64[] nodes
+string mode
+
+---
+bool result
