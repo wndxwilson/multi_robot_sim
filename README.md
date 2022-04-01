@@ -62,7 +62,7 @@ The simulator has 3 navigation modes:
 ![GitHub Logo](images/modes.png)
 
 ## 5 Logging
-When the simulator is closed, it will generate the log files and saved [here](multi_robot_sim/logs/)
+When the simulator is closed, it will generate the log files and saved as multi_robot_sim/logs/
 
 ## 6 API 
 <table>
