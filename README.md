@@ -3,7 +3,7 @@
 This package provides a mutli robot simulator in an simulated real world outdoor path.
 
 #### Features
-- Generate gazebo world using geospatial data from OpenStreetMap
+- Generate gazebo world using geospatial data from OpenStreetMap [osm2gazebo](https://github.com/wndxwilson/osm2gazebo)
 - Able to spawn, delete and monitor each robot individually
 - Robots navigates independently
 - RESTful API to interface with the simulator
@@ -42,7 +42,7 @@ This package provides a mutli robot simulator in an simulated real world outdoor
     ./ setup.sh
     ```
 ## 2 Create the world file
-1. Install osm2gazebo
+1. Install (osm2gazebo)[https://github.com/wndxwilson/osm2gazebo]
 2. Generate the sdf file
 3. Run the import `importWorld`
 
@@ -193,5 +193,5 @@ When the simulator is closed, it will generate the log files and saved [here](mu
 
 </table>
 
-## References
-Multi robot simulation : https://github.com/yangfan/ros_sim
+## Acknowledgements
+The laucnhing of mutli-robot is based on https://github.com/yangfan/ros_sim
