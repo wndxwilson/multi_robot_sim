@@ -1,10 +1,15 @@
 <launch>
-    <arg name="map_file" default="$(find multi_robot_sim)/maps/emptymap.yaml"/>
     <arg name="world_name" default="$(find multi_robot_sim)/worlds/osm2gazebo.sdf"/>
     <arg name="yaml_path" default="$(find multi_robot_sim)/maps/osm2gazebo.yaml"/>
 
     <rosparam param="yaml_path" subst_value="True">$(arg yaml_path)</rosparam>
-    
+
+    <!-- Backend service -->
+    <node pkg="multi_robot_sim" type="backend_service.py" name="robot_management" output="screen"/>
+
+    <node pkg="multi_robot_sim" type="server.py" name="server" output="screen"/>
+
+    <!-- World -->
     <include file="$(find gazebo_ros)/launch/empty_world.launch">
         <arg name="world_name" value="$(arg world_name)"/>
         <arg name="paused" value="false"/>
@@ -12,9 +17,5 @@
         <arg name="gui" value="true"/>
         <arg name="headless" value="false"/>
         <arg name="debug" value="false"/>
-    </include>  
-
-    <node pkg="rviz" type="rviz" name="rviz" required="true"
-          args="-d $(find multi_robot_sim)/rviz/multi_robot_sim.rviz"/>
-          
+    </include> 
 </launch>

@@ -1,2 +1,4 @@
 # ignore ALL log files
 logs/
+__pycache__/
+*.py[cod]

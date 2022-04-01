@@ -47,12 +47,23 @@ This package provides a mutli robot simulator in an simulated real world outdoor
 3. Run the import `importWorld`
 
 ## 3 Running the simulator
-The Flask server will be run on localhost:5050
+The Flask server will be run on localhost:5000
 ```
 roslaunch multi_robot_sim multi_robot_sim.launch world_name:=<insert world name> yaml_path:=<insert yaml path> 
 ```
 
-## 4 API 
+## 4 Navigation modes
+The simulator has 3 navigation modes:
+1. Mode0 - 1-way
+2. Mode1 - Disjointed Loop
+3. Mode2 - Continous Loop
+
+![GitHub Logo](images/modes.png)
+
+## 5 Logging
+When the simulator is closed, it will generate the log files and saved [here](multi_robot_sim/logs/)
+
+## 6 API 
 <table>
   <tr>
     <td><strong>Method</strong></td>
@@ -168,7 +179,7 @@ roslaunch multi_robot_sim multi_robot_sim.launch world_name:=<insert world name>
   
   <tr>
     <td>POST</td>
-    <td>/api/navigation/cancel/td>
+    <td>/api/navigation/cancel</td>
     <td>To cancel the robot navigation.</td>
     <td>robot_name (String) : The robot name of the robot (default=””)
     </td>
@@ -181,3 +192,6 @@ roslaunch multi_robot_sim multi_robot_sim.launch world_name:=<insert world name>
   </tr>
 
 </table>
+
+## References
+Multi robot simulation : https://github.com/yangfan/ros_sim
