@@ -42,7 +42,7 @@ This package provides a mutli robot simulator in an simulated real world outdoor
     ./ setup.sh
     ```
 ## 2 Create the world file
-1. Install (osm2gazebo)[https://github.com/wndxwilson/osm2gazebo]
+1. Install [osm2gazebo](https://github.com/wndxwilson/osm2gazebo)
 2. Generate the sdf file
 3. Run the import `importWorld`
 
@@ -194,4 +194,4 @@ When the simulator is closed, it will generate the log files and saved [here](mu
 </table>
 
 ## Acknowledgements
-The laucnhing of mutli-robot is based on https://github.com/yangfan/ros_sim
+The launch of mutli-robot is based on https://github.com/yangfan/ros_sim
