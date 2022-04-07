@@ -20,8 +20,9 @@ This package provides a mutli robot simulator in an simulated real world outdoor
     ```
     sudo apt-get install python3-pip python3-yaml
     sudo pip3 install rospkg catkin_pkg
-    pip install Flask
-    pip install networkx
+    pip3 install Flask
+    pip3 install networkx
+    pip3 install numpy
     ```
 
 4. Create catkin_ws
@@ -40,7 +41,7 @@ This package provides a mutli robot simulator in an simulated real world outdoor
 6. Setup the environment
     ```
     cd ~/catkin_ws/src/multi_robot_sim/shell_scripts
-    ./ setup.sh
+    ./setup.sh
     ```
 ## 2 Create the world file
 1. Install [osm2gazebo](https://github.com/wndxwilson/osm2gazebo)
