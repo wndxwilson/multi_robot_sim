@@ -10,6 +10,13 @@ This package provides a mutli robot simulator in an simulated real world outdoor
 - RESTful API to interface with the simulator
 
 ## 1 Setup
+### Docker image
+```
+docker pull taiwilson5/multi_robot_sim:v1
+docker run -p 6080:80 -p 5000:5000 --shm-size=512m taiwilson5/multi_robot_sim:v1
+```
+
+### Install from source
 1. Install [ROS melodic](http://wiki.ros.org/melodic/Installation/Ubuntu)
 2. Install ROS dependencies
     ```
