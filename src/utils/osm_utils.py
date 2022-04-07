@@ -2,7 +2,6 @@
 
 import networkx as nx
 import numpy as np
-import matplotlib.pyplot as plt
 from geometry_msgs.msg import PoseArray, Pose
 from std_msgs.msg import Header
 import yaml
