@@ -89,7 +89,7 @@ def move():
     except (rospy.ServiceException, rospy.ROSException) as e:
         return "Service call failed: %s"%e
 
-@app.route("/api/navigation/start" , methods=['POST'])
+@app.route("/api/navigation/resume" , methods=['POST'])
 def start():
     robot_name = request.args.get('robot_name', default="")
     try: 
@@ -104,7 +104,7 @@ def start():
     except (rospy.ServiceException, rospy.ROSException) as e:
         return "Service call failed: %s"%e
 
-@app.route("/api/navigation/stop" , methods=['POST'])
+@app.route("/api/navigation/cancel" , methods=['POST'])
 def stop():
     robot_name = request.args.get('robot_name', default="")
     try: 
@@ -113,7 +113,7 @@ def stop():
         res = stop_srv()
 
         if(res.success):
-            return "robot stop navigation"
+            return "robot cancel navigation"
 
         return "failed"
     except (rospy.ServiceException, rospy.ROSException) as e:
@@ -139,4 +139,4 @@ def test():
     return "API works"
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host="0.0.0.0")

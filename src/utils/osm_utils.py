@@ -62,10 +62,11 @@ class OsmUtil():
             # Check starting point
             if(np.all(((self.G.nodes[node1]['x'],self.G.nodes[node1]['y']) != points[0]))):
                 points = points[::-1]
-            pointsPath = np.append(pointsPath,points,axis=0)
+            pointsPath = np.append(pointsPath,points[1:],axis=0)
 
         uniq, index = np.unique(pointsPath,axis=0, return_index=True)
-        return uniq[index.argsort()]
+        # return uniq[index.argsort()]
+        return pointsPath
     
     def getGoalArray(self,points):
         """
@@ -113,8 +114,6 @@ class OsmUtil():
         msg.header = Header()
         msg.header.frame_id = "odom"
         pose_list = []
-
-        print(goals)
 
         for goal in goals:
             pose_msg = Pose()

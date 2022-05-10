@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
-import re
+from math import sqrt
 import rospy
 import sys
 import actionlib
-import rospkg
 from geometry_msgs.msg import PoseArray
 from move_base_msgs.msg import MoveBaseAction, MoveBaseGoal
 from std_srvs.srv import Trigger
@@ -11,6 +10,7 @@ from multi_robot_sim.srv import MultiRobotSimGoalNodes
 from actionlib_msgs.msg import GoalID
 from utils.state_machine import StateMachine
 from utils.osm_utils import OsmUtil
+from nav_msgs.msg import Odometry
 
 class WaypointNavigation:
     def __init__(self,namespace):
@@ -23,7 +23,7 @@ class WaypointNavigation:
 
         path = rospy.get_param("/yaml_path")
         self.gg = OsmUtil(path)
-
+        
         # Service to pause/start/stop waypoint navigation
         self.start_waypoint_srv = rospy.Service("start_waypoint", Trigger, self.handle_start_waypoint)
         self.stop_waypoint_srv = rospy.Service("stop_waypoint", Trigger, self.handle_stop_waypoint)
@@ -39,6 +39,9 @@ class WaypointNavigation:
         # Publisher
         self.cancel_pub = rospy.Publisher("move_base/cancel",GoalID,queue_size=10)
 
+        # Subscriber
+        robot_pos = rospy.Subscriber("odom",Odometry,self.handle_odom)
+
         # Params
         self.distance_tolerance = 0.1
         self.robot_status = -1
@@ -46,6 +49,9 @@ class WaypointNavigation:
         # Intial state transition
         self.mode = None 
         self.transition = ""
+    
+    def handle_odom(self,msg):
+        self.position = msg.pose.pose.position
 
     def handle_start_waypoint(self,req):
         """
@@ -92,7 +98,6 @@ class WaypointNavigation:
             self.waypoints = self.gg.getGoals(nodes)
             self.mode = "loop"
         
-        # print(nodes)
         if(self.waypoints == None):
             self.transition = ""
             return (False)
@@ -158,12 +163,20 @@ class WaypointNavigation:
         """
         goal = self.createGoalMsg(pose)
         rospy.logwarn("Going to goal...")
+        rospy.logwarn(goal)
+
         self.move_base_client.send_goal(goal)
 
         while(True):
             robot_state = self.move_base_client.get_state()
 
             if(robot_state in [3,4,5,9]):
+                break
+            
+            # Check distance within the goal
+            distance = sqrt( (self.position.x - pose.position.x)**2 + (self.position.y - pose.position.y)**2 )
+            if(distance < 0.55):
+                rospy.loginfo("Distance reached")
                 break
 
             if self.transition == "pause":
